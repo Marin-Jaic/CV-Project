@@ -12,11 +12,12 @@ from data_prep.preprocess import Preprocess
 
 # pool = th.nn.MaxPool2d(kernel_size=2, stride=2)
 # print(pool(image).shape)
-
-train_loader, test_loader = Preprocess().get_data_loaders()
-
 # image = image.transpose(1, 2).transpose(0, 1).unsqueeze(dim = 0)
+
+
+#train_loader, test_loader = Preprocess().get_data_loaders()
 image = zeros_tensor = th.zeros(1, 1, 512, 512)
 unet = UNet(INPUT_HEIGHT= 512, INPUT_WIDTH= 512, INPUT_FEATURE_NUMBER= 1)
-
-unet(image)
+print(unet.first_contracting_conv[0].weight)
+print(unet.parameters())
+# unet(image)

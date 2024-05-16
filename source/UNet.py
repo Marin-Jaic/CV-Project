@@ -33,11 +33,7 @@ class UNet(nn.Module):
         self.pool_stride = POOL_STRIDE
         self.deconvolution_kernel_size = DECONVOLUTION_KERNEL_SIZE
         self.deconvolution_stride = DECONVOLUTION_STRIDE
-        
-        #a list containing tuples of cropped feature map dimensions in the form of (height, width) 
-        #in order their concatenatation during the pipeline
-        self.cropped_dimensions = self.expansive_cropped_dimensions(self.bridge_dimensions())
-        
+
         #MAYBE ITS AVERAGE POOL
         self.pool = nn.MaxPool2d(kernel_size=POOL_KERNEL_SIZE, stride = POOL_STRIDE)
         
@@ -100,18 +96,18 @@ class UNet(nn.Module):
         self.final_convolution = nn.Conv2d(kernel_size = 1,
                                            in_channels = FEATURE_NUMBER,
                                            out_channels = OUTPUT_FEATURE_NUMBER)
-    
-    def bridge_dimensions(self):
-        height = self.input_height
-        width = self.input_width
-        kernel = self.convolution_kernel_size
 
-        #for standard depth 4 and 1 more for the bridge
-        for i in range(5):
-            height = (height - 3 * kernel + 3) // self.pool_stride
-            width = (width - 3 * kernel + 3) // self.pool_stride
-        
-        return (height, width)
+        self.apply(self.weight_initialization)
+
+    def weight_initalization(self, layer):
+        if isinstance(layer, nn.Conv2d) or isinstance(layer, nn.ConvTranspose2d):
+            N = layer.kernel_size[0] * layer.kernel_size[1] * layer.out_channels
+            std_dev = (2.0 / N) ** 0.5
+            nn.init.normal_(layer.weight, mean=0, std=std_dev)
+
+            if layer.bias is not None:
+                #might wanna change this
+                nn.init.constant_(layer.bias, 0)
 
     def crop_feature_map(self, cropped_height, cropped_width, feature_map):
         feature_map_height = feature_map.shape[2]
@@ -121,25 +117,6 @@ class UNet(nn.Module):
         width_first_index = round((feature_map_width - cropped_width) / 2)
 
         return feature_map[:, :, height_first_index:height_first_index + cropped_height, width_first_index:width_first_index + cropped_width]
-
-    def expansive_cropped_dimensions(self, bridge_dimensions):
-        height = bridge_dimensions[0]
-        width = bridge_dimensions[1]
-        kernel = self.convolution_kernel_size
-
-        dimensions = []
-
-        for i in range(4):
-            #formula's incomplete but since we use the default dilation and no padding, it suffices
-            height = (height - 1) * self.deconvolution_stride + self.deconvolution_kernel_size 
-            width = (width - 1) * self.deconvolution_stride + self.deconvolution_kernel_size 
-
-            dimensions.append((height, width))
-
-            height = height - 3 * kernel + 3
-            width = width - 3 * kernel + 3
-        
-        return dimensions
 
     def forward(self, x):
         #I would imagine the input is in dimensions [batch_size, channels, height, width]
@@ -151,27 +128,6 @@ class UNet(nn.Module):
         #print(contracting_third_feature_map.shape)
         contracting_fourth_feature_map = self.fourth_contracting_conv(self.pool(contracting_third_feature_map))
         #print(contracting_fourth_feature_map.shape)
-
-        
-        # expansive_first_feature_map = self.bridge(self.pool(contracting_fourth_feature_map))
-        # concatenated = th.cat((self.crop_feature_map(self.cropped_dimensions[0], contracting_fourth_feature_map),
-        #                     self.first_deconvolution(expansive_first_feature_map)),
-        #                     dim = 1)
-        
-        # expansive_second_feature_map = self.first_expansive_conv(concatenated)
-        # concatenated = th.cat((self.crop_feature_map(self.cropped_dimensions[1], contracting_third_feature_map),
-        #                       self.first_deconvolution(expansive_second_feature_map)),
-        #                       dim = 1)
-        
-        # expansive_third_feature_map = self.second_expansive_conv(concatenated)
-        # concatenated = th.cat((self.crop_feature_map(self.cropped_dimensions[2], contracting_second_feature_map),
-        #                       self.first_deconvolution(expansive_third_feature_map)),
-        #                       dim = 1)
-        
-        # expansive_fourth_feature_map = self.third_expansive_conv(concatenated)
-        # concatenated = th.cat((self.crop_feature_map(self.cropped_dimensions[3],contracting_first_feature_map),
-        #                       self.first_deconvolution(expansive_fourth_feature_map)),
-        #                       dim = 1)
         
         bridge_feature_map = self.first_deconvolution(self.bridge(self.pool(contracting_fourth_feature_map)))
         concatenated = th.cat((self.crop_feature_map(bridge_feature_map.shape[2], 
