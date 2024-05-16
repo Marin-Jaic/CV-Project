@@ -19,14 +19,19 @@ class Preprocess:
         mean = torch.tensor([0.593, 0.567, 0.534])
         std = torch.tensor([0.247, 0.247, 0.247])
 
-        transform = transforms.Compose([
+        img_transform = transforms.Compose([
             transforms.ToTensor(),
             transforms.Resize((600, 400)),
             transforms.Normalize(mean, std)
         ])
 
-        train_dataset = SegmentationDataset(train_df, transform=transform)
-        test_dataset = SegmentationDataset(test_df, transform=transform)
+        mask_transform = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Resize((600, 400), interpolation=transforms.InterpolationMode.NEAREST)
+        ])
+
+        train_dataset = SegmentationDataset(train_df, img_transform=img_transform, mask_transform=mask_transform)
+        test_dataset = SegmentationDataset(test_df, img_transform=img_transform, mask_transform=mask_transform)
 
         train_loader = DataLoader(train_dataset, batch_size=4, shuffle=True)
         test_loader = DataLoader(test_dataset, batch_size=4, shuffle=False)

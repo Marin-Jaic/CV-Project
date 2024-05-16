@@ -7,7 +7,7 @@ DECONVOLUTION_KERNEL_SIZE = 2
 POOL_KERNEL_SIZE = 2
 INPUT_FEATURE_NUMBER = 1
 FEATURE_NUMBER = 64
-OUTPUT_FEATURE_NUMBER = 2
+OUTPUT_FEATURE_NUMBER = 3
 
 class UNet(nn.Module):
     def __init__(self, 
@@ -99,7 +99,7 @@ class UNet(nn.Module):
 
         self.apply(self.weight_initialization)
 
-    def weight_initalization(self, layer):
+    def weight_initialization(self, layer):
         if isinstance(layer, nn.Conv2d) or isinstance(layer, nn.ConvTranspose2d):
             N = layer.kernel_size[0] * layer.kernel_size[1] * layer.out_channels
             std_dev = (2.0 / N) ** 0.5
