@@ -12,7 +12,4 @@ class ConvBlock(nn.Sequential):
                                   in_channels= output_features, 
                                   out_channels= output_features),
                         nn.ReLU(),
-                        nn.Conv2d(kernel_size= kernel_size, 
-                                  in_channels= output_features, 
-                                  out_channels= output_features),
                         )
