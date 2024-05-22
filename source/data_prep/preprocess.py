@@ -1,6 +1,5 @@
 import pyarrow.parquet as pq
 from sklearn.model_selection import train_test_split
-import numpy as np
 from torchvision import transforms
 from .SegmentationDataset import SegmentationDataset
 import torch
@@ -9,7 +8,7 @@ from torch.utils.data import DataLoader
 
 class Preprocess:
     def get_data_loaders(self) -> tuple:
-        dataset = pq.ParquetDataset('../data')
+        dataset = pq.ParquetDataset('./data')
 
         table = dataset.read()
         df = table.to_pandas()
