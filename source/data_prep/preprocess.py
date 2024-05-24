@@ -7,7 +7,8 @@ from torch.utils.data import DataLoader
 
 
 class Preprocess:
-    def get_data_loaders(self) -> tuple:
+
+    def get_data_loaders(self, subset=False) -> tuple:
         dataset = pq.ParquetDataset('./data')
 
         table = dataset.read()
@@ -31,6 +32,10 @@ class Preprocess:
 
         train_dataset = SegmentationDataset(train_df, img_transform=img_transform, mask_transform=mask_transform)
         test_dataset = SegmentationDataset(test_df, img_transform=img_transform, mask_transform=mask_transform)
+
+        if subset:
+            train_dataset = torch.utils.data.Subset(train_dataset, range(1000))
+            test_dataset = torch.utils.data.Subset(test_dataset, range(1000))
 
         train_loader = DataLoader(train_dataset, batch_size=4, shuffle=True)
         test_loader = DataLoader(test_dataset, batch_size=4, shuffle=False)

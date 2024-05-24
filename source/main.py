@@ -1,9 +1,8 @@
 # from PIL import Image
-import torch as th
+import torch
 import numpy as np
 from UNet import UNet
 from data_prep.preprocess import Preprocess
-
 
 # image = Image.open("test_image_big.png")
 # image = np.array(image)
@@ -16,9 +15,9 @@ from data_prep.preprocess import Preprocess
 # image = image.transpose(1, 2).transpose(0, 1).unsqueeze(dim = 0)
 
 
-train_loader, test_loader = Preprocess().get_data_loaders()
-image = zeros_tensor = th.zeros(1, 1, 512, 512)
+# train_loader, test_loader = Preprocess().get_data_loaders()
+image = zeros_tensor = torch.zeros(1, 1, 512, 512)
 unet = UNet(INPUT_HEIGHT=512, INPUT_WIDTH=512, INPUT_FEATURE_NUMBER=1)
-output = unet(image)
 
-print("Done: ", output[output != 0])
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
+print(device)
