@@ -3,12 +3,14 @@ import torch
 from torch.utils.data import Dataset
 from io import BytesIO
 import numpy as np
+
+
 class SegmentationDataset(Dataset):
     def __init__(self, dataframe, img_transform=None, mask_transform=None, mask_classes=3):
         self.dataframe = dataframe
         self.img_transform = img_transform
         self.mask_transform = mask_transform
-        self.mask_classes= mask_classes
+        self.mask_classes = mask_classes
 
     def __len__(self):
         return len(self.dataframe)
