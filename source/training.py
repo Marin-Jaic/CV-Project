@@ -57,7 +57,7 @@ def train_model(model, train_loader, epochs=5, learning_rate=1e-5, amp=False, we
 
             losses += loss.item()
 
-        print(f'Epoch: {epoch}, Loss: {losses / len(train_loader)}, IoU: {iou / len(train_loader)}\n')
+        print(f'\nEpoch: {epoch}, Loss: {losses / len(train_loader)}, IoU: {iou / len(train_loader)}\n')
         epoch_losses.append(losses / len(train_loader))
         epoch_iou.append(iou / len(train_loader))
 
