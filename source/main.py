@@ -1,23 +1,32 @@
-# from PIL import Image
 import torch
-import numpy as np
-from UNet import UNet
-from data_prep.preprocess import Preprocess
 
-# image = Image.open("test_image_big.png")
-# image = np.array(image)
-# image = th.Tensor(image)
-
-# image = image.unsqueeze(dim = 0).unsqueeze(dim = 0)
-
-# pool = th.nn.MaxPool2d(kernel_size=2, stride=2)
-# print(pool(image).shape)
-# image = image.transpose(1, 2).transpose(0, 1).unsqueeze(dim = 0)
-
-
-# train_loader, test_loader = Preprocess().get_data_loaders()
-image = zeros_tensor = torch.zeros(1, 1, 512, 512)
-unet = UNet(INPUT_HEIGHT=512, INPUT_WIDTH=512, INPUT_FEATURE_NUMBER=1)
+from source.data_prep.preprocess import Preprocess
+from source.models.UNet import UNet
+from source.models.UnetV2 import UNetV2
+from training import train_model, test_model
+from matplotlib import pyplot as plt
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
-print(device)
+train_loader, test_loader = Preprocess().get_data_loaders(subset=True)
+
+epochs = 10
+
+# The Unet model produces output masks with dim (404, 212), idk whats wrong
+# unet = UNet(INPUT_HEIGHT=600, INPUT_WIDTH=400, INPUT_FEATURE_NUMBER=3)
+# unet = unet.to(device)
+
+unet_v2 = UNetV2(n_channels=3, n_classes=3)
+unet_v2 = unet_v2.to(device)
+
+train_losses, train_iou = train_model(model=unet_v2, train_loader=train_loader, epochs=epochs)
+test_losses, test_iou = test_model(model=unet_v2, test_loader=test_loader)
+
+plt.plot(train_losses, range(epochs), label='Training loss')
+plt.xlabel('Epochs')
+plt.ylabel('Loss')
+plt.show()
+
+plt.show(test_losses, range(epochs), label='Testing loss')
+plt.xlabel('Epochs')
+plt.ylabel('Loss')
+plt.show()
