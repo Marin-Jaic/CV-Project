@@ -1,6 +1,6 @@
 import torch as th
-from ConvBlock import ConvBlock
 from torch import nn
+from source.models.Convolutions import ConvBlock
 
 CONVOLUTION_KERNEL_SIZE = 3
 DECONVOLUTION_KERNEL_SIZE = 2
