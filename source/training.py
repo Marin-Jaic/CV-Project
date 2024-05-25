@@ -25,15 +25,16 @@ def compute_iou(mask_pred, target_mask):
 
 
 def train_model(model, train_loader, epochs=5, learning_rate=1e-5, amp=False, weight_decay=1e-8,
-                   gradient_clipping=1.0):
+                gradient_clipping=1.0):
+
     optimizer = optim.Adam(model.parameters(), learning_rate, weight_decay=weight_decay)
     grad_scaler = torch.cuda.amp.GradScaler(enabled=amp)
     criterion = nn.CrossEntropyLoss()
-    losses = []
+    epoch_losses, epoch_iou = [], []
 
     for epoch in tqdm(range(epochs)):
         model.train()
-        iou = 0
+        losses, iou = 0, 0
 
         for images, true_mask in tqdm(train_loader):
             optimizer.zero_grad()
@@ -42,6 +43,9 @@ def train_model(model, train_loader, epochs=5, learning_rate=1e-5, amp=False, we
             true_mask = true_mask.to(device=device, dtype=torch.float)
             # Dimensions: (4, 3, 600, 400) == (Batch x Classes x Height x Width)
             pred_mask = model(images).to(device=device)
+
+            print(f"True mask shape: {true_mask.shape}")
+            print(f"Predicted mask shape: {pred_mask.shape}")
 
             loss = criterion(pred_mask, true_mask)
             iou += compute_iou(pred_mask, true_mask)
@@ -54,11 +58,13 @@ def train_model(model, train_loader, epochs=5, learning_rate=1e-5, amp=False, we
             grad_scaler.step(optimizer)
             grad_scaler.update()
 
-            losses.append(loss.item())
+            losses += loss.item()
 
-        print(f'Epoch: {epoch}, Loss: {losses[-1] / len(train_loader)}, Accuracy: {iou / len(train_loader)}')
+        print(f'Epoch: {epoch}, Loss: {losses / len(train_loader)}, IoU: {iou / len(train_loader)}\n')
+        epoch_losses.append(losses / len(train_loader))
+        epoch_iou.append(iou / len(train_loader))
 
-    return losses
+    return epoch_losses, epoch_iou
 
 
 def test_model(model, test_loader):
@@ -75,6 +81,6 @@ def test_model(model, test_loader):
             loss += criterion(pred_mask, true_mask)
             iou += compute_iou(pred_mask, true_mask)
 
-    print(f'Loss: {loss / len(test_loader)}, Accuracy: {iou / len(test_loader)}')
+    print(f'Test Loss: {loss / len(test_loader)}, Test IoU: {iou / len(test_loader)}')
 
     return loss / len(test_loader), iou / len(test_loader)
