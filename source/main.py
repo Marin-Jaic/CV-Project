@@ -11,7 +11,7 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 # A subsample of 1k elements from the dataset is taken
 train_loader, test_loader = Preprocess().get_data_loaders(subset=True)
 
-epochs = 10
+epochs = 2
 
 # The Unet model produces output masks with dim (404, 212), idk whats wrong
 unet = UNet(INPUT_HEIGHT=512, INPUT_WIDTH=522, INPUT_FEATURE_NUMBER=3)
@@ -28,7 +28,7 @@ plt.xlabel('Epochs')
 plt.ylabel('Loss')
 plt.show()
 
-plt.plot(epoch_iou.cpu(), range(epochs), label='Training IoU')
+plt.plot(torch.tensor(epoch_iou).cpu(), range(epochs), label='Training IoU')
 plt.xlabel('Epochs')
 plt.ylabel('IoU')
 plt.show()
