@@ -26,7 +26,7 @@ plt.xlabel('Epochs')
 plt.ylabel('Loss')
 plt.show()
 
-plt.plot(epoch_iou, 1, label='Training IoU')
+plt.plot(epoch_iou, range(epochs), label='Training IoU')
 plt.xlabel('Epochs')
 plt.ylabel('IoU')
 plt.show()
