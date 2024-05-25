@@ -44,9 +44,6 @@ def train_model(model, train_loader, epochs=5, learning_rate=1e-5, amp=False, we
             # Dimensions: (4, 3, 600, 400) == (Batch x Classes x Height x Width)
             pred_mask = model(images).to(device=device)
 
-            print(f"True mask shape: {true_mask.shape}")
-            print(f"Predicted mask shape: {pred_mask.shape}")
-
             loss = criterion(pred_mask, true_mask)
             iou += compute_iou(pred_mask, true_mask)
             # iou += dice_loss(pred_mask, true_mask, multiclass=True)
