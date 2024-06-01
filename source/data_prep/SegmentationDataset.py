@@ -6,22 +6,25 @@ import numpy as np
 
 
 class SegmentationDataset(Dataset):
-    def __init__(self, dataframe, img_transform=None, mask_transform=None, mask_classes=3):
+    def __init__(self, dataframe, img_transform=None, mask_transform=None, mask_classes=3, use_simple_mask=True):
         self.dataframe = dataframe
         self.img_transform = img_transform
         self.mask_transform = mask_transform
+        self.use_simple_mask = use_simple_mask
         self.mask_classes = mask_classes
 
     def __len__(self):
         return len(self.dataframe)
 
-    def __getitem__(self, idx):
+    def  __getitem__(self, idx):
         if torch.is_tensor(idx):
             idx = idx.tolist()
 
         image = Image.open(BytesIO(self.dataframe.iloc[idx, 0]['bytes'])) # image
         mask = np.array(Image.open(BytesIO(self.dataframe.iloc[idx, 1]['bytes']))).astype(np.float16) # mask
-        mask = self.convert2SimpleMask(mask) # mask
+        if self.use_simple_mask:
+            mask = self.convert2SimpleMask(mask) # mask
+            self.mask_classes = 3
         if self.img_transform:
             image = self.img_transform(image)
         if self.mask_transform:
