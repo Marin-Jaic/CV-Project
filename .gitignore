@@ -2,3 +2,4 @@
 __pycache__
 source/data
 source/__pycache__
+source/trained_models/

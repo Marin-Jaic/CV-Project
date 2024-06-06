@@ -8,8 +8,8 @@ from torch.utils.data import DataLoader
 
 class Preprocess:
 
-    def get_data_loaders(self, mask_classes, subset=False, use_simple_mask=True, batch_size=4) -> tuple:
-        dataset = pq.ParquetDataset('../data')
+    def get_data_loaders(self, mask_classes, subset=False, use_simple_mask=True, batch_size=4, subset_size=1000) -> tuple:
+        dataset = pq.ParquetDataset('data')
 
         table = dataset.read()
         df = table.to_pandas()
@@ -42,8 +42,7 @@ class Preprocess:
                                            use_simple_mask=use_simple_mask)
 
         if subset:
-            train_dataset = torch.utils.data.Subset(train_dataset, range(1000))
-            test_dataset = torch.utils.data.Subset(test_dataset, range(1000))
+            train_dataset = torch.utils.data.Subset(train_dataset, range(subset_size))
 
         train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
         test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)

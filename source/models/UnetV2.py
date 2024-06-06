@@ -1,4 +1,5 @@
 from torch import nn
+import torch.nn.functional as F
 from torch.utils.checkpoint import checkpoint
 from source.models.Convolutions import DoubleConv, Down, Up, OutConv
 
@@ -32,7 +33,8 @@ class UNetV2(nn.Module):
         x = self.up2(x, x3)
         x = self.up3(x, x2)
         x = self.up4(x, x1)
-        logits = self.outc(x)
+        x = self.outc(x)
+        logits = F.softmax(x, dim=1)
         return logits
 
     def use_checkpointing(self):

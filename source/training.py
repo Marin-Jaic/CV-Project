@@ -1,9 +1,7 @@
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 from torch import optim
 from tqdm import tqdm
-from models.DiceLoss import dice_loss
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
@@ -24,7 +22,7 @@ def compute_iou(mask_pred, target_mask):
     return iou.mean()
 
 
-def train_model(model, train_loader, epochs=5, learning_rate=1e-5, amp=False, weight_decay=1e-8,
+def train_model(model, train_loader, epochs=10, learning_rate=1e-5, amp=False, weight_decay=1e-8,
                 gradient_clipping=1.0):
 
     optimizer = optim.Adam(model.parameters(), learning_rate, weight_decay=weight_decay)
