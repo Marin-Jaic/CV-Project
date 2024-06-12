@@ -9,7 +9,7 @@ from torch.utils.data import DataLoader
 class Preprocess:
 
     def get_data_loaders(self, mask_classes, subset=False, use_simple_mask=True, batch_size=4, subset_size=1000) -> tuple:
-        dataset = pq.ParquetDataset('data')
+        dataset = pq.ParquetDataset('C:\\Users\\mjaic\\OneDrive\\Desktop\\Delft\\Year 1\\Q4\\Seminar-Computer-Vision-by-Deep-Learning\\data')
 
         table = dataset.read()
         df = table.to_pandas()
