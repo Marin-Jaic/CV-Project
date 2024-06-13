@@ -1,15 +1,11 @@
 import torch
 
 from source.data_prep.preprocess import Preprocess
-from source.models.UNet import UNet
 from source.models.UnetV2 import UNetV2
 from training import train_model, test_model
 from matplotlib import pyplot as plt
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
-
-# A subsample of 1k elements from the dataset is taken
-train_loader, test_loader = Preprocess().get_data_loaders(subset=True)
 
 epochs = 10
 subset_size = 6000
