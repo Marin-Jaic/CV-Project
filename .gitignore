@@ -3,3 +3,11 @@ __pycache__
 source/data
 source/__pycache__
 source/trained_models/
+
+source/figures/18-class/
+
+source/figures/3-class/
+
+source/temp/
+
+source/trained-model-stats/

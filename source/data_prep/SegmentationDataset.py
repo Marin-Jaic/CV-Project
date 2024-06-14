@@ -16,14 +16,14 @@ class SegmentationDataset(Dataset):
     def __len__(self):
         return len(self.dataframe)
 
-    def  __getitem__(self, idx):
+    def __getitem__(self, idx):
         if torch.is_tensor(idx):
             idx = idx.tolist()
 
-        image = Image.open(BytesIO(self.dataframe.iloc[idx, 0]['bytes'])) # image
-        mask = np.array(Image.open(BytesIO(self.dataframe.iloc[idx, 1]['bytes']))).astype(np.float16) # mask
+        image = Image.open(BytesIO(self.dataframe.iloc[idx, 0]['bytes']))  # image
+        mask = np.array(Image.open(BytesIO(self.dataframe.iloc[idx, 1]['bytes']))).astype(np.float16)  # mask
         if self.use_simple_mask:
-            mask = self.convert2SimpleMask(mask) # mask
+            mask = self.convert2SimpleMask(mask)  # mask
             self.mask_classes = 3
         if self.img_transform:
             image = self.img_transform(image)
@@ -52,6 +52,3 @@ class SegmentationDataset(Dataset):
         for i in range(num_classes):
             one_hot_mask[i] = (mask == i).float()
         return one_hot_mask
-
-
-
